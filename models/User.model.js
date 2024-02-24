@@ -1,26 +1,50 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose');
 
-// TODO: Please make sure you edit the User model to whatever makes sense in this case
 const userSchema = new Schema(
   {
     email: {
       type: String,
-      required: [true, 'Email is required.'],
+      required: [true, 'Email is required'],
       unique: true,
       lowercase: true,
       trim: true
     },
     password: {
       type: String,
-      required: [true, 'Password is required.']
+      required: [true, 'Password is required']
+    },
+    name: {
+      type: String,
+      required: [true, 'Name is required.']
+    },
+    preferences: {
+      cuisines: [{ type: String }],
+      foodTypes: [{ type: String }],
+      diningStyles: [{ type: String }]
+    },
+    location: {
+      country: { type: String },
+      city: { type: String }
+    },
+    profilePicture: { type: String },
+    userCode: {
+      type: String,
+      unique: true
     }
   },
   {
-    // this second object adds extra properties: `createdAt` and `updatedAt`    
     timestamps: true
   }
 );
 
-const User = model("User", userSchema);
+// Method to add preferences
+userSchema.methods.addPreferences = function(cuisines, foodTypes, diningStyles) {
+  this.preferences.cuisines = cuisines;
+  this.preferences.foodTypes = foodTypes;
+  this.preferences.diningStyles = diningStyles;
+  return this.save();
+};
+
+const User = model('User', userSchema);
 
 module.exports = User;

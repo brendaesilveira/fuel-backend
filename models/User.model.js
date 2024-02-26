@@ -30,20 +30,24 @@ const userSchema = new Schema(
     userCode: {
       type: String,
       unique: true
-    }
+    },
+    connections: [{ type: String }],
+    likes: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}],
+    been: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}],
+    favourites: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}]
   },
   {
     timestamps: true
   }
 );
 
-// Method to add preferences
+/* // Adding user preferences
 userSchema.methods.addPreferences = function(cuisines, foodTypes, diningStyles) {
   this.preferences.cuisines = cuisines;
   this.preferences.foodTypes = foodTypes;
   this.preferences.diningStyles = diningStyles;
   return this.save();
-};
+}; */
 
 const User = model('User', userSchema);
 

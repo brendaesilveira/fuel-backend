@@ -29,7 +29,7 @@ const restaurantSchema = new Schema(
         title: String
       }
     ],
-    yelp_id: {
+    restaurantId: {
       type: String
     }
   },

@@ -32,7 +32,7 @@ const userSchema = new Schema(
       unique: true
     },
     connections: [{ type: String }],
-    likes: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}],
+    likes: [String],
     been: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}],
     favourites: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}]
   },

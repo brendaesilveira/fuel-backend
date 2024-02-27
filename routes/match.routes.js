@@ -2,12 +2,12 @@ const router = require('express').Router();
 const Match = require('../models/Match.model');
 const User = require('../models/User.model');
 
-// Create a new match between connected users
-router.post('/likes', async (req, res, next) => {
+// Handle matches
+router.post('/matches', async (req, res, next) => {
   try {
-    const { userCode, friendCode, restaurantId } = req.body;
+    const { userCode, friendCode } = req.body;
 
-    // Find user and friend
+    // Find the users
     const user = await User.findOne({ userCode });
     const friend = await User.findOne({ userCode: friendCode });
 
@@ -15,24 +15,25 @@ router.post('/likes', async (req, res, next) => {
       return res.status(404).json({ message: 'User or friend not found' });
     }
 
-    // Check if connection exists
-    if (!user.connections.includes(friendCode) || !friend.connections.includes(userCode)) {
-    return res.status(400).json({ message: 'Connection not found' });
-   }
-   console.log(restaurantId)
+    // Find the common liked restaurants
+    const commonLikes = user.likes.filter(restaurantId => friend.likes.includes(restaurantId));
 
-    // Create the match
-   const likedId = user.likes.find((id) => id === restaurantId)
+    // Create a new Match instance with populated users and restaurants arrays
+    const match = new Match({
+      users: [user._id, friend._id], // Populate with user IDs
+      restaurants: commonLikes
+    });
 
-    if (user.likedId === friend.likedId) {
-    return res.status(201).json({ message: 'Its a match' });
-   }
+    // Save the match
+    await match.save();
 
+    return res.status(200).json({ message: 'Matches created successfully' });
   } catch (error) {
-    console.error('Error creating match:', error);
+    console.error('Error creating matches:', error);
     next(error);
   }
-});
+})
+
 
 // Get all matches
 router.get('/match', async (req, res, next) => {

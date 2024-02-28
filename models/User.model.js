@@ -33,21 +33,13 @@ const userSchema = new Schema(
     },
     connections: [{ type: String }],
     likes: [String],
-    been: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}],
-    favourites: [{type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}]
+    been: [String],
+    favourites: [String]
   },
   {
     timestamps: true
   }
 );
-
-/* // Adding user preferences
-userSchema.methods.addPreferences = function(cuisines, foodTypes, diningStyles) {
-  this.preferences.cuisines = cuisines;
-  this.preferences.foodTypes = foodTypes;
-  this.preferences.diningStyles = diningStyles;
-  return this.save();
-}; */
 
 const User = model('User', userSchema);
 

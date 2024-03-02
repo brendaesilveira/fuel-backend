@@ -2,10 +2,9 @@ const { Schema, model } = require('mongoose');
 
 const matchSchema = new Schema(
   {
-    user: [{
+    users: [{
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true
     }],
     restaurants: [{
       type: Schema.Types.ObjectId,

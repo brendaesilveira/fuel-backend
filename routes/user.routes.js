@@ -2,89 +2,10 @@ const router = require('express').Router();
 const Restaurant = require('../models/Restaurant.model');
 const fileUploader = require('../config/cloudinary.config');
 const User = require('../models/User.model')
-const mongoose = require('mongoose');
 
+/* favourites, been and settings */
 
-/* File to handle user activities - likes, favourites, been and settings */
-
-/* LIKES */
-
-// Handle user likes
-router.post('/likes', async (req, res, next) => {
-  try {
-    const { userCode, restaurantId } = req.body;
-
-    // Find the user
-    const user = await User.findOne({ userCode });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Check if restaurant is already liked
-    if (user.likes.includes(restaurantId)) {
-      return res.status(400).json({ message: 'Restaurant was already liked' });
-    }
-
-    // Add the restaurant to the user's likes array
-    user.likes.push(restaurantId);
-    await user.save();
-
-    return res.status(200).json({ message: 'Restaurant liked successfully' });
-  } catch (error) {
-    console.error('Error liking restaurant:', error);
-    next(error);
-  }
-})
-
-// Get all user likes
-  router.get('/likes', async (req, res, next) => {
-  try {
-    const { userCode } = req.query; // => http://localhost:5005/api/likes?userCode=${userCode}
-
-    // Find the user
-    const user = await User.findOne({ userCode });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    return res.status(200).json({ likes: user.likes });
-  } catch (error) {
-    console.error('Error fetching user likes:', error);
-    next(error);
-  }
-});
-
-// Remove a like
-  router.delete('/likes', async (req, res, next) => {
-  try {
-      const { userCode, restaurantId } = req.body;
-
-      // Find the user
-      const user = await User.findOne({ userCode });
-
-      if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-      }
-
-      // Check if restaurant is already liked
-      if (!user.likes.includes(restaurantId)) {
-      return res.status(400).json({ message: 'Restaurant not found on likes' });
-      }
-
-      // Remove the restaurant from the user's likes array
-      user.likes = user.likes.filter(id => id !== restaurantId);
-      await user.save();
-
-      return res.status(200).json({ message: 'Restaurant unliked successfully' });
-  } catch (error) {
-      console.error('Error unliking restaurant:', error);
-      next(error);
-  }
-});
-
-/* FAVOURITES */
+/* ---------------------------------------- FAVOURITES ---------------------------------------- */
 
 // Handle user favourites
 router.post('/favourites', async (req, res, next) => {
@@ -161,7 +82,7 @@ router.get('/favourites', async (req, res, next) => {
   }
 });
 
-/* BEEN */
+/* ---------------------------------------- BEEN ---------------------------------------- */
 
 // Handle restaurants which user has already been
 router.post('/been', async (req, res, next) => {

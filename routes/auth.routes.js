@@ -48,7 +48,7 @@ router.post('/signup', async (req, res, next) => {
       email,
       name,
       password: hashedPassword,
-      userCode
+      userCode,
     });
 
     // returning the created user without sending the hashedPassword

@@ -12,11 +12,6 @@ router.post('/likes', async (req, res, next) => {
   try {
     const { userCode, friendCode, restaurantId } = req.body;
 
-    // Check if everything is provided
-    if (!userCode || !friendCode || !restaurantId) {
-      return res.status(400).json({ message: 'Missing required parameters' });
-    }
-
     // Find the user
     const user = await User.findOne({ userCode });
     if (!user) {
@@ -28,46 +23,47 @@ router.post('/likes', async (req, res, next) => {
     if (!restaurant) {
       return res.status(404).json({ message: 'Restaurant not found' });
     }
-    console.log(user)
+
     // Check if restaurant is already liked
     if (user.likes.includes(restaurantId)) {
       return res.status(400).json({ message: 'Restaurant was already liked' });
     }
 
-    // Find the friend
-    const friend = await User.findOne({ userCode: friendCode });
-    if (!friend) {
-      return res.status(404).json({ message: 'Friend not found' });
-    }
-
-    // Check if the friend has already liked the same restaurant
-    if (friend.likes.includes(restaurantId)) {
-      // Check if a match document already exists
-      let match = await Match.findOne({
-        users: { $all: [user._id, friend._id] }
-      });
-
-      if (!match) {
-        // If match document doesn't exist, create one
-        match = new Match({
-          users: [user._id, friend._id],
-          restaurants: [restaurantId]
-        });
-      } else {
-        // If it already exists, add the restaurant to it
-        match.restaurants.push(restaurantId);
+    // If friendCode is provided, check if the friend has liked the same restaurant
+    if (friendCode) {
+      const friend = await User.findOne({ userCode: friendCode });
+      if (!friend) {
+        return res.status(404).json({ message: 'Friend not found' });
       }
 
-      // Add the restaurant to user likes array
-      user.likes.push(restaurantId);
+      if (friend.likes.includes(restaurantId)) {
+        // Check if a match document already exists
+        let match = await Match.findOne({
+          users: { $all: [user._id, friend._id] }
+        });
 
-      // Save
-      await Promise.all([user.save(), friend.save(), match.save()]);
+        if (!match) {
+          // If match document doesn't exist, create one
+          match = new Match({
+            users: [user._id, friend._id],
+            restaurants: [restaurantId]
+          });
+        } else {
+          // If it already exists, add the restaurant to it
+          match.restaurants.push(restaurantId);
+        }
 
-      return res.status(200).json({ message: 'Restaurant liked and match created successfully' });
+        // Add the restaurant to user likes array
+        user.likes.push(restaurantId);
+
+        // Save
+        await Promise.all([user.save(), friend.save(), match.save()]);
+
+        return res.status(200).json({ message: 'Restaurant liked and match created successfully' });
+      }
     }
 
-    // If friend hasn't liked the restaurant, just add it to user's likes array
+    // If friendCode is not provided or friend has not liked the restaurant, just add it to user's likes array
     user.likes.push(restaurantId);
     await user.save();
 
@@ -78,6 +74,7 @@ router.post('/likes', async (req, res, next) => {
     next(error);
   }
 });
+
 
 /* ---------------------------------------- DELETE ---------------------------------------- */
 

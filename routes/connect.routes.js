@@ -1,12 +1,9 @@
 const router = require('express').Router();
 const User = require('../models/User.model');
-const Restaurant = require('../models/Restaurant.model')
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
-/* Routes to connect users */
+// Routes to connect users
 
-/* CONNECTING */
+/* ---------------------------------------- CONNECTING ---------------------------------------- */
 router.post('/connect', async (req, res, next) => {
   const { userCode, friendCode } = req.body;
 
@@ -44,7 +41,7 @@ router.post('/connect', async (req, res, next) => {
 });
 
 
-  /* DISCONNECTING */
+/* ---------------------------------------- DISCONNECTING ---------------------------------------- */
   router.post('/disconnect', async (req, res, next) => {
     const { userCode, friendCode } = req.body;
 

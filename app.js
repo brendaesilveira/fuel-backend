@@ -29,9 +29,6 @@ app.use('/api', isAuthenticated, favouritesRoutes);
 const matchRoutes = require('./routes/match.routes');
 app.use('/api', isAuthenticated, matchRoutes);
 
-const navigationRoutes = require('./routes/navigation.routes');
-app.use('/api', isAuthenticated, navigationRoutes);
-
 const restaurantsRoutes = require('./routes/restaurants.routes');
 app.use('/api', isAuthenticated, restaurantsRoutes);
 

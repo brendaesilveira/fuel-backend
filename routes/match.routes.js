@@ -3,6 +3,8 @@ const Restaurant = require('../models/Restaurant.model');
 const User = require('../models/User.model')
 const Match = require('../models/Match.model');
 
+// File to handle likes and matches
+
 /* ---------------------------------------- POST ---------------------------------------- */
 
 // Handle user likes
@@ -152,7 +154,7 @@ router.get('/likes', async (req, res, next) => {
 // Get all MATCHES
 router.get('/match', async (req, res, next) => {
   try {
-    const { userCode, friendCode } = req.query;
+    const { userCode, friendCode } = req.query // -> http://localhost:5005/api/match?userCode=4o0z8&friendCode=o7uh4
 
     // Find the user
     const user = await User.findOne({ userCode })

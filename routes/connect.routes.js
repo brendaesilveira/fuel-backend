@@ -24,12 +24,17 @@ router.post('/connect', async (req, res, next) => {
         return res.status(400).json({ message: 'Users are already connected' });
       }
 
-      // Updating connections array
+      // Check if they are in the same location
+      if (user.location !== friend.location) {
+        return res.status(400).json({ message: 'Users must be in the same location to connect' });
+      } else {
+        // If so, connect them
       user.connections.push(friendCode);
       friend.connections.push(userCode);
 
       await user.save();
       await friend.save();
+      }
 
       res.json({ message: 'Users connected successfully' });
     } catch (error) {

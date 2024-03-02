@@ -8,7 +8,7 @@ const saltRounds = 10;
 
 // User signup route
 router.post('/signup', async (req, res, next) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, location } = req.body;
 
   try {
     if (email === '' || password === '' || name === '') {
@@ -48,7 +48,8 @@ router.post('/signup', async (req, res, next) => {
       email,
       name,
       password: hashedPassword,
-      userCode,
+      location,
+      userCode
     });
 
     // returning the created user without sending the hashedPassword
@@ -78,7 +79,7 @@ router.post('/login', async (req, res, next) => {
 
     if (isPasswordCorrect) {
       // create a payload for the JWT with the user info
-      const payload = { _id: user._id, email: user.email, name: user.name };
+      const payload = { _id: user._id, email: user.email, name: user.name};
 
       const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
         algorithm: 'HS256', // algorithm we want to encrypt the token with

@@ -47,7 +47,11 @@ const userSchema = new Schema(
     reviews: [{
       type: Schema.Types.ObjectId,
       ref: 'Review',
-    }]
+    }],
+    setup_completed: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true

@@ -6,6 +6,28 @@ const mongoose = require('mongoose');
 const fileUploader = require('../config/cloudinary.config')
 const bcrypt = require('bcryptjs');
 
+/* ---------------------------------------- SETUP STATUS ---------------------------------------- */
+
+// Check if user has completed setup
+router.put('/settings/setup_completed', async (req, res) => {
+  try {
+    const { userCode } = req.body;
+
+    // Find the user
+    const user = await User.findOne({ userCode });
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update setup_completed field to true
+    await User.findOneAndUpdate({ userCode }, { setup_completed: true });
+    res.status(200).json({ message: "Setup completed successfully" });
+  } catch (error) {
+      console.error("Error updating setup status:", error);
+      res.status(500).json({ message: "Failed to complete setup" });
+  }
+});
+
 /* ---------------------------------------- PROFILE IMAGE ---------------------------------------- */
 
 // Handle image UPLOAD

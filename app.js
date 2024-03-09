@@ -1,10 +1,11 @@
 require("dotenv").config();
-
 require("./db");
-
 const express = require("express");
-
 const app = express();
+const cors = require('cors');
+
+// Enable CORS for all requests
+app.use(cors());
 
 require("./config")(app);
 const isAuthenticated = require('./middleware/jwt.middleware').isAuthenticated;

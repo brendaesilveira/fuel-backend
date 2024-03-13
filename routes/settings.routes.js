@@ -6,73 +6,17 @@ const mongoose = require('mongoose');
 const fileUploader = require('../config/cloudinary.config')
 const bcrypt = require('bcryptjs');
 
-/* ---------------------------------------- SETUP STATUS ---------------------------------------- */
-
-// Check if user has completed setup
-router.put('/settings/setup_completed', async (req, res) => {
-  try {
-    const { userCode } = req.body;
-
-    // Find the user
-    const user = await User.findOne({ userCode });
-    if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Update setup_completed field to true
-    await User.findOneAndUpdate({ userCode }, { setup_completed: true });
-    res.status(200).json({ message: "Setup completed successfully" });
-  } catch (error) {
-      console.error("Error updating setup status:", error);
-      res.status(500).json({ message: "Failed to complete setup" });
-  }
-});
-
 /* ---------------------------------------- PROFILE IMAGE ---------------------------------------- */
 
 // Handle image UPLOAD
 router.post('/settings/upload', fileUploader.single('file'), async (req, res) => {
-    try {
-        const { userCode } = req.body;
-
-        // Find the user
-        const user = await User.findOne({ userCode });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Update the user's profile picture
-        user.profilePicture = req.file.path;
-        await user.save();
-
-        res.status(200).json({ message: 'Profile picture uploaded successfully', imgUrl: req.file.path });
-    } catch (error) {
-        console.error('An error occurred uploading the image', error);
-        res.status(500).json({ message: 'An error occurred' });
-    }
-});
-
-// Handle image UPDATE
-router.put('/settings/upload', fileUploader.single('file'), async (req, res) => {
-    try {
-        const { userCode } = req.body;
-
-        // Find the user
-        const user = await User.findOne({ userCode });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Update the user's profile picture
-        user.profilePicture = req.file.path;
-        await user.save();
-
-        res.status(200).json({ message: 'Profile picture updated successfully', imgUrl: req.file.path });
-    } catch (error) {
-        console.error('An error occurred updating the image', error);
-        res.status(500).json({ message: 'An error occurred' });
-    }
-});
+  try {
+    res.status(200).json({imgUrl: req.file.path})
+  } catch (error) {
+    console.log('An eror occured uploading the image', error)
+    res.status(500).json({message: 'An error occured'})
+  }
+})
 
 // Handle image DELETE
 router.delete('/settings/upload', async (req, res) => {
@@ -115,6 +59,12 @@ router.put('/settings/location', async (req, res, next) => {
 
       // Update user's location
       user.location = newLocation;
+
+       // Check if setup is completed
+       if (!user.setupCompleted) {
+        user.setupCompleted = true;
+    }
+
       await user.save();
 
       // Iterate over user connections and disconnect any users who are not in the same location

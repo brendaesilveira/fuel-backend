@@ -79,7 +79,7 @@ router.post('/login', async (req, res, next) => {
 
     if (isPasswordCorrect) {
       // create a payload for the JWT with the user info
-      const payload = { _id: user._id, email: user.email, name: user.name};
+      const payload = { _id: user._id, email: user.email, name: user.name, setupCompleted: user.setupCompleted};
 
       const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
         algorithm: 'HS256', // algorithm we want to encrypt the token with
@@ -97,13 +97,33 @@ router.post('/login', async (req, res, next) => {
 });
 
 // Verify token route
-router.get('/verify', isAuthenticated, (req, res, next) => {
+router.get('/verify', isAuthenticated, async (req, res, next) => {
   // if the jwt is valid, the payload gets decoded by the middleware
   // and is made available in req.payload
   console.log('req.payload', req.payload);
-
+  const user = await User.findById(req.payload._id,  {password: 0})
   // send it back with the user data from the token
-  res.json(req.payload);
+  res.json(user);
+});
+
+// Initial setup
+router.post('/setup', async (req, res, next) => {
+  const { location, imgUrl, _id } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(_id, {
+      location,
+      profilePicture: imgUrl,
+      setupCompleted: true
+    },
+    {new: true});
+
+    console.log('Updated user', updatedUser);
+    res.status(201).json(updatedUser);
+  } catch (error) {
+    console.log('An error occurred updating the user', error);
+    next(error);
+  }
 });
 
 module.exports = router;

@@ -48,7 +48,7 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Review',
     }],
-    setup_completed: {
+    setupCompleted: {
       type: Boolean,
       default: false
     }

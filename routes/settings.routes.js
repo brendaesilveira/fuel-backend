@@ -57,15 +57,16 @@ router.put('/settings/location', async (req, res, next) => {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Update user's location
-      user.location = newLocation;
+      const updatedUser = await User.findByIdAndUpdate(
+        user._id,
+        { location: newLocation },
+        { new: true }
+      );
 
        // Check if setup is completed
        if (!user.setupCompleted) {
         user.setupCompleted = true;
     }
-
-      await user.save();
 
       // Iterate over user connections and disconnect any users who are not in the same location
       const disconnectedUsers = []

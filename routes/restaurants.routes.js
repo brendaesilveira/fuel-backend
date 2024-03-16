@@ -1,12 +1,29 @@
 const router = require('express').Router();
 const axios = require('axios');
 const Restaurant = require('../models/Restaurant.model');
-const { isAuthenticated } = require('../middleware/jwt.middleware');
 
-router.get('/restaurants', isAuthenticated, async (req, res, next) => {
+router.get('/restaurants/:locationRest', async (req, res, next) => {
+  const { locationRest } = req.params;
+  const page = parseInt(req.query.page) || 1; // Get the page parameter or default to 1
+
   try {
-    const { location, categories } = req.query;
-    const apiUrl = `https://api.yelp.com/v3/businesses/search?location=${location}&categories=${categories}$limit=20&offset=40`;
+    const perPage = 10; // Number of restaurants per page
+    const skip = (page - 1) * perPage; // Calculate the number of restaurants to skip
+    const allRestaurants = await Restaurant.find({ 'location.city': locationRest }).skip(skip).limit(perPage);
+    const totalCount = await Restaurant.countDocuments({ 'location.city': locationRest });
+
+    res.status(200).json({ restaurants: allRestaurants, totalCount });
+  } catch (error) {
+    console.error('An error occurred getting all restaurants:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+router.get('/restaurants', async (req, res, next) => {
+  try {
+    const { location, category } = req.body;
+    const apiUrl = `https://api.yelp.com/v3/businesses/search?location=${location}&categories=${category}$limit=20&offset=40`;
     const apiKey = process.env.YELP_API_KEY;
 
     const response = await axios.get(apiUrl, {

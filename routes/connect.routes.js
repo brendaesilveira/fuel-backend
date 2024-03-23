@@ -26,8 +26,8 @@ router.post('/connect', async (req, res, next) => {
           return res.status(400).json({ message: 'Users must be in the same location to connect' });
       } else {
           // If so, connect them
-          user.connections.push(friendCode);
-          friend.connections.push(userCode);
+          user.connections.push({ userCode: friendCode, userName: friend.name });
+          friend.connections.push({ userCode, userName: user.name });
 
           await user.save();
           await friend.save();

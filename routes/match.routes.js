@@ -31,7 +31,9 @@ router.post('/likes', async (req, res, next) => {
     }
 
     // If friendCode is provided, check if the friend has liked the same restaurant
-      const friend = await User.findOne({ userCode: user.connections[3] });
+    const userCodes = user.connections.map(connection => connection.userCode);
+    const friend = await User.findOne({ userCode: { $in: userCodes } });
+
       if (!friend) {
         return res.status(404).json({ message: 'Friend not found' });
       }
@@ -151,23 +153,27 @@ router.delete('/likes', async (req, res, next) => {
 // Get all user LIKES
 router.get('/likes', async (req, res, next) => {
   try {
-    const { userCode } = req.query // => http://localhost:5005/api/likes?userCode=${userCode}
+    const { userCode } = req.query;
 
     // Find the user and populate likes array with restaurant objects
-    const user = await User.findOne({ userCode }).populate('likes')
+    const user = await User.findOne({ userCode }).populate('likes');
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' })
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const likedRestaurants = user.likes.map(like => like.toObject())
+    const likedRestaurants = user.likes.map(like => like.toObject());
 
-    return res.status(200).json({ likes: likedRestaurants })
+    // Get IDs of liked restaurants
+    const likedRestaurantIds = user.likes.map(like => like.restaurantId);
+
+    return res.status(200).json({ likes: likedRestaurants, likedRestaurantIds });
   } catch (error) {
-    console.error('Error fetching user likes:', error)
+    console.error('Error fetching user likes:', error);
     next(error);
   }
 });
+
 
 // Get all MATCHES
 router.get('/match', async (req, res, next) => {

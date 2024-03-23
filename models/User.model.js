@@ -31,7 +31,10 @@ const userSchema = new Schema(
       type: String,
       unique: true
     },
-    connections: [{ type: String }],
+    connections: [{
+      userCode: { type: String },
+      userName: { type: String }
+    }],
     likes: [{
       type: Schema.Types.ObjectId,
       ref: 'Restaurant',

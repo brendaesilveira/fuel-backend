@@ -4,11 +4,11 @@ const Restaurant = require('../models/Restaurant.model');
 
 router.get('/restaurants/:locationRest', async (req, res, next) => {
   const { locationRest } = req.params;
-  const page = parseInt(req.query.page) || 1; // Get the page parameter or default to 1
+  const page = parseInt(req.query.page) || 1;
 
   try {
-    const perPage = 10; // Number of restaurants per page
-    const skip = (page - 1) * perPage; // Calculate the number of restaurants to skip
+    const perPage = 30;
+    const skip = (page - 1) * perPage;
     const allRestaurants = await Restaurant.find({ 'location.city': locationRest }).skip(skip).limit(perPage);
     const totalCount = await Restaurant.countDocuments({ 'location.city': locationRest });
 

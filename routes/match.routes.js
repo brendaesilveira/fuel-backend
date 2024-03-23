@@ -10,7 +10,8 @@ const Match = require('../models/Match.model');
 // Handle user likes
 router.post('/likes', async (req, res, next) => {
   try {
-    const { userCode, friendCode, restaurantId } = req.body;
+    const { userCode, restaurantId } = req.body;
+
 
     // Find the user
     const user = await User.findOne({ userCode });
@@ -30,8 +31,7 @@ router.post('/likes', async (req, res, next) => {
     }
 
     // If friendCode is provided, check if the friend has liked the same restaurant
-    if (friendCode) {
-      const friend = await User.findOne({ userCode: friendCode });
+      const friend = await User.findOne({ userCode: user.connections[3] });
       if (!friend) {
         return res.status(404).json({ message: 'Friend not found' });
       }
@@ -60,7 +60,7 @@ router.post('/likes', async (req, res, next) => {
         await Promise.all([user.save(), friend.save(), match.save()]);
 
         return res.status(200).json({ message: 'Restaurant liked and match created successfully' });
-      }
+
     }
 
     // If friendCode is not provided or friend has not liked the restaurant, just add it to user's likes array
@@ -75,6 +75,27 @@ router.post('/likes', async (req, res, next) => {
   }
 });
 
+// Handle user discards
+router.post('/discards', async (req, res, next) => {
+  try {
+    const { userCode, restaurantId } = req.body;
+
+    // Find the user
+    const user = await User.findOne({ userCode });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Remove restaurant from user's list of available restaurants
+    user.discardedRestaurants.push(restaurantId);
+    await user.save();
+
+    return res.status(200).json({ message: 'Restaurant discarded successfully' });
+  } catch (error) {
+    console.error('Error discarding restaurant:', error);
+    next(error);
+  }
+});
 
 /* ---------------------------------------- DELETE ---------------------------------------- */
 

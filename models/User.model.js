@@ -51,7 +51,11 @@ const userSchema = new Schema(
     setupCompleted: {
       type: Boolean,
       default: false
-    }
+    },
+    discardedRestaurants: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Restaurant',
+    }]
   },
   {
     timestamps: true

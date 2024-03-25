@@ -12,28 +12,28 @@ router.post('/signup', async (req, res, next) => {
 
   try {
     if (email === '' || password === '' || name === '') {
-      return res.status(400).json({ message: 'All fields are mandatory' });
+      return res.status(400).json({ message: 'Please fill out all fields to proceed.' });
     }
 
     // use regex to validate the email format
     const emailRegex = /\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/;
 
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Provide valid email address' });
+      return res.status(400).json({ message: 'Please provide valid email address' });
     }
 
     // use regex to validate the password format
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{6,}$/;
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
-        message: 'Password must have at least 6 characters and contain one number, one lowercase, one uppercase, and one special character.'
+        message: 'Please update your password to meet all requirements.'
       });
     }
 
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: 'The provided email is already registered' });
+      return res.status(400).json({ message: 'This email is already registered. Please use a different email or try logging in' });
     }
 
     // Encrypt the password
@@ -66,13 +66,13 @@ router.post('/login', async (req, res, next) => {
 
   try {
     if (email === '' || password === '') {
-      return res.status(400).json({ message: 'All fields are mandatory' });
+      return res.status(400).json({ message: 'Please enter your email and password to proceed.' });
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ message: 'Provided email is not registered.' });
+      return res.status(401).json({ message: 'This email is not registered yet. Please create an account.' });
     }
 
     const isPasswordCorrect = bcrypt.compareSync(password, user.password);
@@ -88,7 +88,7 @@ router.post('/login', async (req, res, next) => {
 
       res.status(200).json({ authToken });
     } else {
-      return res.status(401).json({ message: 'Unable to authenticate user' });
+      return res.status(401).json({ message: 'Incorrect password. Please double-check and try again.' });
     }
   } catch (error) {
     console.log('An error occurred login in the user', error);

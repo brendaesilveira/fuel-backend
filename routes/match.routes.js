@@ -193,18 +193,21 @@ router.get('/match', async (req, res, next) => {
     }
 
     // Check if they are connected
-    if (user.connections.includes(friend.userCode) || friend.connections.includes(user.userCode)) {
+    if (user.connections.find(friend => friend.userCode === friend.userCode) || friend.connections.find(friend => friend.userCode === user.userCode)) {
       // If so, find if they have a match and populate the user and restaurants fields
       const match = await Match.findOne({
         users: { $all: [user._id, friend._id] }
       }).populate('restaurants');
 
       if (match) {
-        return res.status(200).json({ match });
+        return res.status(200).json({match});
       } else {
         return res.status(404).json({ message: 'No matches found for the user and friend' });
       }
+    } else {
+
     }
+    return res.json({message: 'something'})
   } catch (error) {
     console.error('Error fetching user likes:', error);
     next(error);

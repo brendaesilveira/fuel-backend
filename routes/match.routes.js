@@ -212,4 +212,24 @@ router.get('/match', async (req, res, next) => {
   }
 });
 
+// Get all DISCARDS
+router.get('/discards', async (req, res, next) => {
+  try {
+    const { userCode } = req.query;
+
+    const user = await User.findOne({ userCode });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const discardedRestaurants = user.discardedRestaurants;
+
+    return res.status(200).json({ discardedRestaurants });
+  } catch (error) {
+    console.error('Error getting discarded restaurants:', error);
+    next(error);
+  }
+});
+
+
 module.exports = router;

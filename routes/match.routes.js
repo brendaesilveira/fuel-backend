@@ -217,14 +217,14 @@ router.get('/discards', async (req, res, next) => {
   try {
     const { userCode } = req.query;
 
-    const user = await User.findOne({ userCode });
+    const user = await User.findOne({ userCode }).populate('discardedRestaurants')
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const discardedRestaurants = user.discardedRestaurants;
+    const discardedRestaurantIds = user.discardedRestaurants.map(discard => discard.restaurantId);
 
-    return res.status(200).json({ discardedRestaurants });
+    return res.status(200).json({ discardedRestaurantIds });
   } catch (error) {
     console.error('Error getting discarded restaurants:', error);
     next(error);

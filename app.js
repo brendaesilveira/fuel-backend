@@ -1,10 +1,15 @@
 require("dotenv").config();
 require("./db");
 const express = require("express");
+const favicon = require('serve-favicon');
+const path = require('path'); // Import path module for resolving file paths
 const app = express();
 const cors = require('cors');
 
 app.use(cors());
+
+// Serve favicon
+app.use(favicon(path.join(__dirname, 'favicon.ico.png')));
 
 require("./config")(app);
 const isAuthenticated = require('./middleware/jwt.middleware').isAuthenticated;

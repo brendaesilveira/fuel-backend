@@ -36,9 +36,6 @@ app.use('/api', isAuthenticated, matchRoutes);
 const restaurantsRoutes = require('./routes/restaurants.routes');
 app.use('/api', isAuthenticated, restaurantsRoutes);
 
-const reviewRoutes = require('./routes/review.routes');
-app.use('/api', isAuthenticated, reviewRoutes);
-
 const settingsRoutes = require('./routes/settings.routes');
 app.use('/api', isAuthenticated, settingsRoutes);
 

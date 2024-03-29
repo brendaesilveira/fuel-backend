@@ -9,26 +9,30 @@
 | POST   | /auth/signup | Creates a new user |
 | POST   | /auth/login  | Logs the user      |
 | GET    | /auth/verify | Verifies the JWT   |
+| POST   | /auth/setup  | Creates user setup |
 
-### Navigation Routes
+### Been Routes
 
 | Method | Route      | Description        |
 | ------ | ---------- | ------------------ |
-| GET    | /navigation/profile | Redirects to user's profile   |
-| GET    | /navigation/profile/been  | Redirects to "Been" tab in user's profile   |
-| GET    | /navigation/profile/saved | Redirects to "Saved" tab in user's profile  |
-| GET    | /navigation/profile/liked | Redirects to "Liked" tab in user's profile  |
+| POST    | /been | Add restaurant to been   |
+| DELETE    | /been  | Removes a restaurant from been   |
+| GET    | /been | Gets all restaurants marked as been  |
 
-### Match Routes
+### Connect Routes
 
 | Method | Route       | Description        |
 | ------ | ----------- | ------------------ |
-| GET    | /match/:userId/matches | Retrieves matches for a user   |
-| POST   | /match/create | Creates a new match   |
+| POST    | /connect | Connects user to friend   |
+| POST   | /disconnect | Undo users connection   |
 
-### Restaurants Routes
+### Favourites Routes
 
-| GET    | /restaurant/restaurants | Fetches restaurant details   |
+| Method | Route      | Description        |
+| ------ | ---------- | ------------------ |
+| POST    | /favourites | Add restaurant to favourites  |
+| DELETE    | /favourites  | Removes a restaurant from favourites   |
+| GET    | /favourites | Gets all restaurants favourites  |
 
 ### Review Routes
 
@@ -38,14 +42,35 @@
 | PUT    | /review/:restaurantId/reviews/:reviewId | Updates a review  |
 | DELETE | /review/:restaurantId/reviews/:reviewId | Deletes a revieW  |
 
-### User Routes
+### Match Routes
 
 | Method | Route       | Description        |
 | ------ | ----------- | ------------------ |
-| POST   | /user/:id/like | Likes a restaurant   |
-| POST   | /user/:id/favorite | Adds a restaurant to favorites  |
-| POST   | /user/:id/been | Marks a restaurant as visited   |
-| POST   | /user/upload | Handles uploading a profile picture   |
+| POST   | /likes | Likes a restaurant and creates a match   |
+| POST   | /discards | Discards a restaurant  |
+| DELETE   | /likes | Dislikes a restaurant   |
+| GET   | /likes | Gets all likes   |
+| GET   | /match | Gets all matches   |
+| GET   | /discards | Gets all discards   |
+
+### Restaurant Routes
+
+| Method | Route       | Description        |
+| ------ | ----------- | ------------------ |
+| GET   | /restaurants/:locationRest | Retrieves restaurants by location   |
+| GET   | /restaurants | Searches restaurants using the Yelp API  |
+
+### Settings Routes
+
+| Method | Route       | Description        |
+| ------ | ----------- | ------------------ |
+| POST	   | /settings/upload	 | Handles image upload for user profile   |
+| GET   | /settings/upload	 | Deletes user profile picture  |
+| PUT   | /settings/location	 | Updates user location  |
+| PUT   | /settings/name	 | Updates user name  |
+| PUT   | /settings/email	 | Updates user email  |
+| PUT   | /settings/password	 | Updates user password  |
+| DELETE  | /settings/delete/:id	 | Deletes user account  |
 
 ## Models
 
@@ -53,20 +78,29 @@
 
 ```js
 {
-  name: String,
   email: String,
   password: String,
+  name: String,
   preferences: {
-    cuisines: [String],
-    foodTypes: [String],
-    diningStyles: [String]
-  },
+      cuisines: [{ type: String }],
+      foodTypes: [{ type: String }],
+      diningStyles: [{ type: String }]
+    },
   location: {
     country: String,
     city: String
   },
   profilePicture: String,
-  userCode: String
+  userCode: String,
+  connections: [{
+    userCode: {type: String},
+    userName: {type: String}
+  }],
+  likes: {type: Schema.Type.ObjectId, ref: 'Restaurant'},
+  been: {type: Schema.Type.ObjectId, ref: 'Restaurant'},
+  favourites: {type: Schema.Type.ObjectId, ref: 'Restaurant'},
+  setupCompleted: Boolean,
+  discardedRestaurants: {type: Schema.Type.ObjectId, ref: 'Restaurant'}
 }
 ```
 
@@ -91,7 +125,8 @@
     alias: String,
     title: String
   },
-  yelp_id: String
+  restaurantId: String,
+  restaurant_url: String
 }
 ```
 
@@ -99,39 +134,7 @@
 
 ```js
 {
-  users: [ObjectId],
-  restaurant: ObjectId
+  users: {type: Schema.Type.ObjectId, ref: 'User'},
+  restaurant: {type: Schema.Type.ObjectId, ref: 'Restaurant'}
 }
-```
-
-### Review Model
-
-```js
-{
-  user: ObjectId,
-  restaurant: ObjectId,
-  rating: Number,
-  text: String
-}
-```
-
-### User Activity Model
-
-```js
-{
-  user: ObjectId,
-  activityType: String,
-  restaurant: ObjectId
-}
-```
-
-### User Connection Model
-
-```js
-{
-  requester: ObjectId,
-  recipient: ObjectId,
-  status: String
-}
-
 ```

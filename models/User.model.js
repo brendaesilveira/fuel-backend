@@ -47,10 +47,6 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Restaurant',
     }],
-    reviews: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Review',
-    }],
     setupCompleted: {
       type: Boolean,
       default: false

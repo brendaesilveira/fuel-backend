@@ -7,7 +7,7 @@ router.get('/restaurants/:locationRest', async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
 
   try {
-    const perPage = 30;
+    const perPage = 10;
     const skip = (page - 1) * perPage;
     const allRestaurants = await Restaurant.find({ 'location.city': locationRest }).skip(skip).limit(perPage);
     const totalCount = await Restaurant.countDocuments({ 'location.city': locationRest });
@@ -22,8 +22,8 @@ router.get('/restaurants/:locationRest', async (req, res, next) => {
 
 router.get('/restaurants', async (req, res, next) => {
   try {
-    const { location, category } = req.body;
-    const apiUrl = `https://api.yelp.com/v3/businesses/search?location=${location}&categories=${category}$limit=20&offset=40`;
+    const { location, category } = req.query;
+    const apiUrl = `https://api.yelp.com/v3/businesses/search?location=${location}&categories=${category}&limit=20&offset=40`;
     const apiKey = process.env.YELP_API_KEY;
 
     const response = await axios.get(apiUrl, {
@@ -44,6 +44,7 @@ router.get('/restaurants', async (req, res, next) => {
       restaurantId: business.id
     }));
 
+    console.log(restaurants)
     await Restaurant.insertMany(restaurants);
 
     res.json(restaurants);

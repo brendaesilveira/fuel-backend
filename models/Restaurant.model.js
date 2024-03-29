@@ -31,6 +31,9 @@ const restaurantSchema = new Schema(
     ],
     restaurantId: {
       type: String
+    },
+    restaurant_url: {
+      type: String
     }
   },
   {
